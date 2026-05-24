@@ -1,6 +1,6 @@
 # PureRemove — Suppression d'arrière-plan par IA
 
-![Version](https://img.shields.io/badge/version-1.2.0-blueviolet?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.2.1-blueviolet?style=flat-square)
 ![Plateforme](https://img.shields.io/badge/plateforme-Windows%2010%2F11-0078D4?style=flat-square&logo=windows)
 ![Stack](https://img.shields.io/badge/stack-Tauri%20v2%20·%20Rust%20·%20React%20·%20ONNX-orange?style=flat-square)
 ![Licence](https://img.shields.io/badge/licence-MIT-green?style=flat-square)

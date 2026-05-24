@@ -1,6 +1,6 @@
 {
   "productName": "PureRemove",
-  "version": "1.0.0",
+  "version": "1.2.1",
   "identifier": "com.pureremove.desktop",
   "build": {
     "frontendDist": "../dist",
@@ -10,10 +10,10 @@
   },
   "app": {
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: blob: https://asset.localhost asset://localhost; style-src 'self' 'unsafe-inline'; script-src 'self'",
+      "csp": "default-src 'self'; img-src 'self' data: https://asset.localhost asset://localhost; style-src 'self' 'unsafe-inline'; script-src 'self'",
       "assetProtocol": {
         "enable": true,
-        "scope": ["**"]
+        "scope": ["$RESOURCE/**", "$APPDATA/**"]
       }
     },
     "windows": [

@@ -1,10 +1,10 @@
 @echo off
-title PureRemove v1.2.0 - Build Release x64
+title PureRemove v1.2.1 - Build Release x64
 cd /d "%~dp0"
 
 echo.
 echo  ====================================================
-echo   PureRemove v1.2.0 - Compilation Release x64
+echo   PureRemove v1.2.1 - Compilation Release x64
 echo  ====================================================
 echo.
 
@@ -88,7 +88,7 @@ if exist "%NSIS_DIR%" (
 )
 
 :: Log horodate
-echo [%DATE% %TIME%] Build v1.2.0 OK (code %BUILD_CODE%) >> ".logs\build.log"
+echo [%DATE% %TIME%] Build v1.2.1 OK (code %BUILD_CODE%) >> ".logs\build.log"
 
 echo.
 echo  ====================================================
