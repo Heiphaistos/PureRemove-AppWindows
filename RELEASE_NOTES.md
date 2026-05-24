@@ -5,6 +5,19 @@
 
 ---
 
+## v1.2.1 — Mai 2026 — Correctifs sécurité
+
+### Sécurité
+
+- **Validation de chemin dans `save_result_to_file`** — nouvelle fonction `is_safe_save_path()` en Rust qui bloque toute tentative d'écriture vers `C:\Windows`, `C:\Program Files`, `C:\Program Files (x86)` et `C:\System`. Le chemin passé depuis le frontend est systématiquement vérifié avant toute opération I/O.
+- **0 vulnérabilités npm** — mise à jour de `vite`, `rollup`, `picomatch` et `postcss` via `npm audit fix`. Les 18 vulnérabilités signalées par GitHub Dependabot (7 high, 8 moderate, 3 low) ont été résorbées. Toutes concernaient des devDependencies (outils de build).
+
+### Corrections
+
+- `build.bat` : correction de la chaîne de version affichée (`v1.1.0` → `v1.2.0`) dans le titre, le bandeau et l'entrée de log.
+
+---
+
 ## v1.2.0 — Mai 2026
 
 ### Nouveautés
