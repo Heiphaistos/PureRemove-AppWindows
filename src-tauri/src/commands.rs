@@ -76,9 +76,8 @@ pub async fn process_single_image(
 
     let img = load_image(&file_path).map_err(|e| e.to_string())?;
     let mask = ml_engine::run_inference(&img).map_err(|e| e.to_string())?;
-    let result_data_url = apply_mask(&img, &mask, &options.background)
-        .and_then(|r| encode_base64_png(&r))
-        .map_err(|e| e.to_string())?;
+    let result_img = apply_mask(&img, &mask, &options.background);
+    let result_data_url = encode_base64_png(&result_img).map_err(|e| e.to_string())?;
 
     Ok(ProcessResult { original_data_url, result_data_url })
 }
@@ -126,7 +125,7 @@ pub async fn process_batch_images(
 fn process_one_file(path: &Path, options: &ProcessOptions) -> anyhow::Result<String> {
     let img = load_image(path)?;
     let mask = ml_engine::run_inference(&img)?;
-    let result = apply_mask(&img, &mask, &options.background)?;
+    let result = apply_mask(&img, &mask, &options.background);
     encode_base64_png(&result).map_err(Into::into)
 }
 
@@ -171,9 +170,8 @@ pub async fn process_clipboard_image(
 
     let img = load_image_from_bytes(&bytes).map_err(|e| e.to_string())?;
     let mask = ml_engine::run_inference(&img).map_err(|e| e.to_string())?;
-    let result_data_url = apply_mask(&img, &mask, &options.background)
-        .and_then(|r| encode_base64_png(&r))
-        .map_err(|e| e.to_string())?;
+    let result_img = apply_mask(&img, &mask, &options.background);
+    let result_data_url = encode_base64_png(&result_img).map_err(|e| e.to_string())?;
 
     Ok(ProcessResult { original_data_url, result_data_url })
 }
@@ -193,7 +191,7 @@ pub async fn reprocess_clipboard_image(
 
     let img = load_image_from_bytes(&bytes).map_err(|e| e.to_string())?;
     let mask = ml_engine::run_inference(&img).map_err(|e| e.to_string())?;
-    let result = apply_mask(&img, &mask, &options.background).map_err(|e| e.to_string())?;
+    let result = apply_mask(&img, &mask, &options.background);
 
     encode_base64_png(&result).map_err(|e| e.to_string())
 }

@@ -213,6 +213,12 @@ pub fn encode_png(img: &DynamicImage) -> Result<Vec<u8>> {
     Ok(buf.into_inner())
 }
 
+/// Charge l'image d'origine et l'encode en data URL PNG (aperçu avant traitement).
+pub fn original_preview_data_url(path: &Path) -> Result<String> {
+    let img = load_image(path)?;
+    encode_base64_png(&img)
+}
+
 /// Encode en PNG puis encode en base64 (pour transfert frontend ↔ backend).
 pub fn encode_base64_png(img: &DynamicImage) -> Result<String> {
     let png_bytes = encode_png(img)?;
