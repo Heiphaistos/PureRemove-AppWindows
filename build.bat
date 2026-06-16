@@ -49,9 +49,8 @@ rustup target add x86_64-pc-windows-msvc >nul 2>&1
 echo [2/3] Compilation release x64 (peut prendre 2-5 min)...
 echo.
 
-:: On passe par un script PS pour tee sans casser ERRORLEVEL
-powershell -NoProfile -Command ^
-  "$p = Start-Process -FilePath 'npx' -ArgumentList 'tauri','build','--target','x86_64-pc-windows-msvc' -NoNewWindow -Wait -PassThru; exit $p.ExitCode"
+:: Invocation directe npx tauri build (aucune entree externe, arguments statiques hardcodes)
+call npx tauri build --target x86_64-pc-windows-msvc
 set BUILD_CODE=%ERRORLEVEL%
 
 :: Si on veut aussi le log : relance avec redirect (optionnel, decommentez)
