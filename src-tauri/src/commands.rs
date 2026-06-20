@@ -235,17 +235,47 @@ pub async fn copy_result_to_clipboard(data_url: String) -> Result<(), String> {
 }
 
 /// Vérifie que le chemin de destination n'est pas dans une zone système protégée.
-fn is_safe_save_path(path: &Path) -> bool {
+/// Canonicalise le chemin pour prévenir les attaques par symlink/jonction/chemin UNC.
+fn is_safe_save_path(path: &Path) -> Result<(), String> {
+    // Bloquer les chemins UNC (\\server\share) avant canonicalisation
+    let raw = path.to_string_lossy();
+    if raw.starts_with("\\\\") || raw.starts_with("//") {
+        return Err("Chemin UNC refusé : écriture sur des partages réseau interdite".to_string());
+    }
+
+    // Bloquer les séquences de traversal dans le chemin brut
+    for component in path.components() {
+        if matches!(component, std::path::Component::ParentDir) {
+            return Err("Chemin refusé : séquence '..' interdite".to_string());
+        }
+    }
+
+    // Résoudre le chemin absolu via le répertoire parent (le fichier n'existe pas encore)
+    let canonical_dir = path
+        .parent()
+        .ok_or_else(|| "Chemin de destination invalide : pas de répertoire parent".to_string())?
+        .canonicalize()
+        .map_err(|e| format!("Répertoire de destination inaccessible : {e}"))?;
+
+    let canonical_str = canonical_dir.to_string_lossy().to_lowercase();
+
     let forbidden_prefixes = [
         "c:\\windows",
         "c:\\program files",
         "c:\\program files (x86)",
+        "c:\\programdata",
         "c:\\system",
+        "c:\\users\\all users",
     ];
-    let path_str = path.to_string_lossy().to_lowercase();
-    !forbidden_prefixes
-        .iter()
-        .any(|prefix| path_str.starts_with(prefix))
+
+    if forbidden_prefixes.iter().any(|prefix| canonical_str.starts_with(prefix)) {
+        return Err(format!(
+            "Chemin refusé : écriture interdite dans une zone système protégée ({})",
+            canonical_dir.display()
+        ));
+    }
+
+    Ok(())
 }
 
 /// Sauvegarde un résultat PNG (base64 data URL) vers un fichier.
@@ -254,11 +284,7 @@ fn is_safe_save_path(path: &Path) -> bool {
 pub async fn save_result_to_file(data_url: String, dest_path: String) -> Result<(), String> {
     let dest = Path::new(&dest_path);
 
-    if !is_safe_save_path(dest) {
-        return Err(format!(
-            "Chemin refusé : écriture interdite dans une zone système protégée ({dest_path})"
-        ));
-    }
+    is_safe_save_path(dest)?;
 
     let b64 = data_url
         .strip_prefix("data:image/png;base64,")
@@ -269,6 +295,25 @@ pub async fn save_result_to_file(data_url: String, dest_path: String) -> Result<
     std::fs::write(dest, &png_bytes).map_err(|e| e.to_string())
 }
 
+/// Sanitise un composant de nom de fichier : supprime les caractères dangereux Windows/POSIX.
+fn sanitize_filename(name: &str) -> String {
+    let s = name
+        .replace('\0', "")
+        .replace('/', "_")
+        .replace('\\', "_")
+        .replace(':', "_")
+        .replace('*', "_")
+        .replace('?', "_")
+        .replace('"', "_")
+        .replace('<', "_")
+        .replace('>', "_")
+        .replace('|', "_")
+        .replace("..", "");
+
+    let s = s.trim().trim_matches('.').to_string();
+    if s.is_empty() { "output".to_string() } else { s }
+}
+
 /// Sauvegarde plusieurs résultats dans un dossier (écriture directe, sans double décodage).
 #[tauri::command]
 pub async fn save_batch_to_folder(
@@ -276,21 +321,45 @@ pub async fn save_batch_to_folder(
     folder: String,
 ) -> Result<(), String> {
     let folder_path = PathBuf::from(&folder);
+
+    // Valider le dossier de destination avec canonicalisation
+    // Le dossier doit exister ou être créable dans une zone non-système
     std::fs::create_dir_all(&folder_path).map_err(|e| e.to_string())?;
+    let canonical_folder = folder_path
+        .canonicalize()
+        .map_err(|e| format!("Dossier de destination inaccessible : {e}"))?;
+
+    let folder_str = canonical_folder.to_string_lossy().to_lowercase();
+    let forbidden_prefixes = [
+        "c:\\windows",
+        "c:\\program files",
+        "c:\\program files (x86)",
+        "c:\\programdata",
+        "c:\\system",
+    ];
+    if forbidden_prefixes.iter().any(|prefix| folder_str.starts_with(prefix)) {
+        return Err(format!(
+            "Dossier refusé : écriture interdite dans une zone système protégée ({})",
+            canonical_folder.display()
+        ));
+    }
 
     for (name, data_url) in items {
-        let stem = PathBuf::from(&name)
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or("output")
-            .to_string();
+        // Sanitiser le nom de fichier pour éviter path traversal dans le nom
+        let stem = sanitize_filename(
+            &PathBuf::from(&name)
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("output")
+                .to_string()
+        );
 
         let b64 = data_url
             .strip_prefix("data:image/png;base64,")
             .unwrap_or(&data_url);
         let png_bytes = STANDARD.decode(b64).map_err(|e| e.to_string())?;
 
-        let dest = folder_path.join(format!("{stem}_nobg.png"));
+        let dest = canonical_folder.join(format!("{stem}_nobg.png"));
         std::fs::write(&dest, &png_bytes).map_err(|e| e.to_string())?;
     }
 

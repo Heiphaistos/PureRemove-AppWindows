@@ -25,6 +25,7 @@ pub fn run() {
             save_result_to_file,
             save_batch_to_folder,
             check_model,
+            clear_clipboard_cache,
         ])
         .run(tauri::generate_context!())
         .expect("Erreur critique au lancement de Tauri");
