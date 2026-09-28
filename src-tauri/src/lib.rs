@@ -1,6 +1,7 @@
 pub mod commands;
 pub mod image_processor;
 pub mod ml_engine;
+pub mod path_guard;
 
 use commands::*;
 use tauri::Manager;

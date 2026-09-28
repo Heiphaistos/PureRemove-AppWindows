@@ -8,11 +8,6 @@
     "core:event:default",
     "core:window:default",
     "dialog:allow-open",
-    "dialog:allow-save",
-    "fs:allow-read-file",
-    "fs:allow-write-file",
-    "fs:allow-read-dir",
-    "fs:allow-exists",
-    "fs:allow-mkdir"
+    "dialog:allow-save"
   ]
 }

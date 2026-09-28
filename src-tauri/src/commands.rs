@@ -6,6 +6,7 @@ use crate::{
         original_preview_data_url, BackgroundColor,
     },
     ml_engine,
+    path_guard::check_write_target,
 };
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::{Deserialize, Serialize};
@@ -232,65 +233,31 @@ pub async fn copy_result_to_clipboard(data_url: String) -> Result<(), String> {
     .map_err(|e| e.to_string())?
 }
 
-/// Vérifie que le chemin de destination n'est pas dans une zone système protégée.
-/// Canonicalise le chemin pour prévenir les attaques par symlink/jonction/chemin UNC.
-fn is_safe_save_path(path: &Path) -> Result<(), String> {
-    // Bloquer les chemins UNC (\\server\share) avant canonicalisation
-    let raw = path.to_string_lossy();
-    if raw.starts_with("\\\\") || raw.starts_with("//") {
-        return Err("Chemin UNC refusé : écriture sur des partages réseau interdite".to_string());
-    }
-
-    // Bloquer les séquences de traversal dans le chemin brut
-    for component in path.components() {
-        if matches!(component, std::path::Component::ParentDir) {
-            return Err("Chemin refusé : séquence '..' interdite".to_string());
-        }
-    }
-
-    // Résoudre le chemin absolu via le répertoire parent (le fichier n'existe pas encore)
-    let canonical_dir = path
-        .parent()
-        .ok_or_else(|| "Chemin de destination invalide : pas de répertoire parent".to_string())?
-        .canonicalize()
-        .map_err(|e| format!("Répertoire de destination inaccessible : {e}"))?;
-
-    let canonical_str = canonical_dir.to_string_lossy().to_lowercase();
-
-    let forbidden_prefixes = [
-        "c:\\windows",
-        "c:\\program files",
-        "c:\\program files (x86)",
-        "c:\\programdata",
-        "c:\\system",
-        "c:\\users\\all users",
-    ];
-
-    if forbidden_prefixes.iter().any(|prefix| canonical_str.starts_with(prefix)) {
-        return Err(format!(
-            "Chemin refusé : écriture interdite dans une zone système protégée ({})",
-            canonical_dir.display()
-        ));
-    }
-
-    Ok(())
+/// Extrait les octets d'une data URL image base64 : préfixe exigé, base64 strict.
+fn decode_image_data_url(data_url: &str) -> Result<Vec<u8>, String> {
+    let b64 = ["data:image/png;base64,", "data:image/jpeg;base64,", "data:image/webp;base64,"]
+        .iter()
+        .find_map(|p| data_url.strip_prefix(p))
+        .ok_or("Données refusées : data URL image base64 attendue")?;
+    STANDARD.decode(b64).map_err(|e| format!("Base64 invalide : {e}"))
 }
 
-/// Sauvegarde un résultat PNG (base64 data URL) vers un fichier.
+/// Sauvegarde un résultat (base64 data URL) vers un fichier image.
 /// Écriture directe des bytes — pas de double décodage/réencodage.
 #[tauri::command]
 pub async fn save_result_to_file(data_url: String, dest_path: String) -> Result<(), String> {
     let dest = Path::new(&dest_path);
-
-    is_safe_save_path(dest)?;
-
-    let b64 = data_url
-        .strip_prefix("data:image/png;base64,")
-        .unwrap_or(&data_url);
-
-    let png_bytes = STANDARD.decode(b64).map_err(|e| e.to_string())?;
-
-    std::fs::write(dest, &png_bytes).map_err(|e| e.to_string())
+    let ext = dest
+        .extension()
+        .and_then(|e| e.to_str())
+        .map(str::to_ascii_lowercase)
+        .unwrap_or_default();
+    if !["png", "jpg", "jpeg", "webp"].contains(&ext.as_str()) {
+        return Err("Extension refusée : png, jpg, jpeg ou webp attendu".to_string());
+    }
+    let dest = check_write_target(dest)?;
+    let bytes = decode_image_data_url(&data_url)?;
+    std::fs::write(&dest, &bytes).map_err(|e| e.to_string())
 }
 
 /// Sanitise un composant de nom de fichier : supprime les caractères dangereux Windows/POSIX.
@@ -320,27 +287,9 @@ pub async fn save_batch_to_folder(
 ) -> Result<(), String> {
     let folder_path = PathBuf::from(&folder);
 
-    // Valider le dossier de destination avec canonicalisation
-    // Le dossier doit exister ou être créable dans une zone non-système
-    std::fs::create_dir_all(&folder_path).map_err(|e| e.to_string())?;
-    let canonical_folder = folder_path
-        .canonicalize()
-        .map_err(|e| format!("Dossier de destination inaccessible : {e}"))?;
-
-    let folder_str = canonical_folder.to_string_lossy().to_lowercase();
-    let forbidden_prefixes = [
-        "c:\\windows",
-        "c:\\program files",
-        "c:\\program files (x86)",
-        "c:\\programdata",
-        "c:\\system",
-    ];
-    if forbidden_prefixes.iter().any(|prefix| folder_str.starts_with(prefix)) {
-        return Err(format!(
-            "Dossier refusé : écriture interdite dans une zone système protégée ({})",
-            canonical_folder.display()
-        ));
-    }
+    // Valider AVANT de créer quoi que ce soit
+    let canonical_folder = check_write_target(&folder_path)?;
+    std::fs::create_dir_all(&canonical_folder).map_err(|e| e.to_string())?;
 
     for (name, data_url) in items {
         // Sanitiser le nom de fichier pour éviter path traversal dans le nom
@@ -352,10 +301,7 @@ pub async fn save_batch_to_folder(
                 .to_string()
         );
 
-        let b64 = data_url
-            .strip_prefix("data:image/png;base64,")
-            .unwrap_or(&data_url);
-        let png_bytes = STANDARD.decode(b64).map_err(|e| e.to_string())?;
+        let png_bytes = decode_image_data_url(&data_url)?;
 
         let dest = canonical_folder.join(format!("{stem}_nobg.png"));
         std::fs::write(&dest, &png_bytes).map_err(|e| e.to_string())?;
@@ -377,5 +323,25 @@ pub async fn check_model(app: AppHandle) -> Result<String, String> {
         Ok(model_path.to_string_lossy().to_string())
     } else {
         Err("Modèle RMBG-1.4 introuvable. Placez model.onnx dans resources/".to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn data_url_strict() {
+        assert_eq!(decode_image_data_url("data:image/png;base64,QUJD").unwrap(), b"ABC");
+        assert!(decode_image_data_url("QUJD").is_err());
+        assert!(decode_image_data_url("data:text/plain;base64,QUJD").is_err());
+        assert!(decode_image_data_url("data:image/png;base64,@@@").is_err());
+    }
+
+    #[test]
+    fn save_refuses_bad_extension() {
+        let dest = std::env::temp_dir().join("pr_evil.bat").to_string_lossy().to_string();
+        let r = tauri::async_runtime::block_on(save_result_to_file("data:image/png;base64,QUJD".into(), dest));
+        assert!(r.is_err());
     }
 }
