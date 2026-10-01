@@ -47,20 +47,14 @@
 
 ### 1. Télécharger la release
 
-Rendez-vous sur la page [Releases GitHub](https://github.com/heiphaistos44-crypto/PureRemove/releases) et téléchargez :
+Rendez-vous sur la page [Releases GitHub](https://github.com/Heiphaistos/PureRemove-AppWindows/releases/latest) et téléchargez :
 
-- **`PureRemove_x64-setup.exe`** — installeur NSIS (recommandé)
-- ou le **ZIP portable** si disponible
+- **`PureRemove_<version>_x64-setup.exe`** — installeur NSIS (recommandé), ou le `.msi`
+- ou **`PureRemove_<version>_portable.zip`** — à extraire en entier : `model.onnx` doit rester à côté de `pure-remove-portable.exe`
 
-### 2. Obtenir le modèle RMBG-1.4
+### 2. Modèle RMBG-1.4
 
-Le modèle IA n'est **pas inclus** dans l'installeur en raison de sa taille (~178 MB).
-
-1. Rendez-vous sur [huggingface.co/briaai/RMBG-1.4](https://huggingface.co/briaai/RMBG-1.4)
-2. Téléchargez le fichier **`model.onnx`**
-3. Placez-le dans le dossier `resources/` de l'application :
-   - Après installation NSIS : `%AppData%\com.pureremove.desktop\resources\` (chemin variable selon Tauri)
-   - En mode portable : placez `model.onnx` dans le même dossier que l'exécutable sous `resources/`
+Le modèle IA (`model.onnx`, ~170 Mo) est **inclus** dans l'installeur, le `.msi` et le ZIP portable : rien à télécharger à part.
 
 > Si le modèle est absent au démarrage, l'application affiche une bannière d'avertissement et désactive le traitement jusqu'à ce que le fichier soit détecté.
 

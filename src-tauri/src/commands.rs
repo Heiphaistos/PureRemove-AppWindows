@@ -322,7 +322,10 @@ pub async fn check_model(app: AppHandle) -> Result<String, String> {
     if model_path.exists() {
         Ok(model_path.to_string_lossy().to_string())
     } else {
-        Err("Modèle RMBG-1.4 introuvable. Placez model.onnx dans resources/".to_string())
+        Err(format!(
+            "Modèle IA introuvable ({}). Réinstallez PureRemove ou, en version portable, gardez model.onnx à côté de l'exécutable.",
+            model_path.display()
+        ))
     }
 }
 

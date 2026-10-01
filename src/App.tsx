@@ -7,6 +7,7 @@ import { SplitPreview } from "@/components/SplitPreview";
 import { BatchList } from "@/components/BatchList";
 import { OutputOptions } from "@/components/OutputOptions";
 import { generateId } from "@/lib/utils";
+import { version } from "../package.json";
 import type { AppMode, BackgroundColor, BatchProgressEvent, ImageItem, ProcessOptions } from "@/types";
 
 // ─── Types locaux ────────────────────────────────────────────────────────────
@@ -248,7 +249,7 @@ export default function App() {
             <img src="/logo.png" alt="PureRemove" className="w-full h-full object-cover" />
           </div>
           <span className="text-foreground font-bold text-lg tracking-tight">PureRemove</span>
-          <span className="text-muted-foreground text-xs bg-secondary px-2 py-0.5 rounded-full">v1.2</span>
+          <span className="text-muted-foreground text-xs bg-secondary px-2 py-0.5 rounded-full">v{version}</span>
         </div>
 
         <OutputOptions value={background} onChange={setBackground} disabled={single?.isProcessing} />
@@ -264,8 +265,9 @@ export default function App() {
           <div className="text-sm text-destructive">
             <p className="font-semibold mb-0.5">Modèle IA introuvable</p>
             <p className="text-destructive/80">
-              Placez <code className="bg-destructive/20 px-1 rounded">model.onnx</code> dans{" "}
-              <code className="bg-destructive/20 px-1 rounded">src-tauri/resources/</code>
+              Le fichier <code className="bg-destructive/20 px-1 rounded">model.onnx</code> doit se trouver
+              dans le même dossier que PureRemove. Réinstallez l'application ou, pour la version
+              portable, extrayez tout le contenu du ZIP.
             </p>
           </div>
         </div>

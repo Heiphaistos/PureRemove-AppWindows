@@ -20,7 +20,7 @@ pub fn init_model(model_path: &Path) -> Result<()> {
 
     if !model_path.exists() {
         return Err(anyhow!(
-            "model.onnx introuvable à : {}. Téléchargez RMBG-1.4 depuis HuggingFace.",
+            "Modèle IA introuvable ({}). Réinstallez PureRemove ou, en version portable, gardez model.onnx à côté de l'exécutable.",
             model_path.display()
         ));
     }

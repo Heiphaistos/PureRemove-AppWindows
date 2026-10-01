@@ -5,6 +5,17 @@
 
 ---
 
+## v1.5.1 — 2026-10-02
+
+### Corrigé
+
+- Le modèle IA est de nouveau inclus dans l'installeur, le `.msi` et le ZIP portable (1.3.1 et 1.5.0 étaient livrées sans lui, l'application ne pouvait rien détourer).
+- Version affichée dans l'en-tête lue depuis `package.json` (affichait « v1.2 »).
+- Message clair quand le modèle est introuvable.
+- La compilation échoue désormais si `model.onnx` est absent, n'est qu'un pointeur Git LFS, ou si une config de build retire les ressources.
+
+---
+
 ## v1.5.0 — 2026-10-01
 
 ### Sécurité

@@ -18,6 +18,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          # model.onnx (168 Mo) est en Git LFS : sans lfs, seul le pointeur est
+          # recupere et build.rs fait echouer la compilation.
+          lfs: true
 
       # Dépendances système de Tauri v2. webkit2gtk-4.1 est la version attendue
       # par Tauri 2 (la 4.0 est celle de Tauri 1) ; patchelf est requis par le
