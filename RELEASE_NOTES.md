@@ -5,6 +5,15 @@
 
 ---
 
+## v1.5.0 — 2026-10-01
+
+### Sécurité
+
+- Control Flow Guard activé sur l'exécutable Windows.
+- Garde des chemins système réparée (comparaison sur chemins canonisés, refus en cas de doute) et enregistrement d'image durci (1.4.0, jamais publiée).
+
+---
+
 ## v1.2.1 — Mai 2026 — Correctifs sécurité
 
 ### Sécurité
