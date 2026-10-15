@@ -1,6 +1,6 @@
 {
   "productName": "PureRemove",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "identifier": "com.pureremove.desktop",
   "build": {
     "frontendDist": "../dist",
@@ -13,7 +13,10 @@
       "csp": "default-src 'self'; img-src 'self' data: https://asset.localhost asset://localhost; style-src 'self' 'unsafe-inline'; script-src 'self'",
       "assetProtocol": {
         "enable": true,
-        "scope": ["$RESOURCE/**", "$APPDATA/**"]
+        "scope": [
+          "$RESOURCE/**",
+          "$APPDATA/**"
+        ]
       }
     },
     "windows": [
@@ -45,7 +48,22 @@
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": ""
+      "timestampUrl": "",
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDAyOTAzNkE4M0NCRDU0MzEKUldReFZMMDhxRGFRQWxCNmR1UU5uZ1dOdHJRa0tZZUNCRG5ReU12c3JYeU0rSGhlY2RoRVdsRWQK",
+      "endpoints": [
+        "https://github.com/Heiphaistos/PureRemove-AppWindows/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
     }
   }
 }
