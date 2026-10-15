@@ -57,7 +57,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDAyOTAzNkE4M0NCRDU0MzEKUldReFZMMDhxRGFRQWxCNmR1UU5uZ1dOdHJRa0tZZUNCRG5ReU12c3JYeU0rSGhlY2RoRVdsRWQK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcyQjkxRTUwMTQwRDg4NkIKUldScmlBMFVVQjY1Y3MrM1IydVBmZDd0RVRrdVl2cHl6Vjlxa3J4TlZ6ZmVDTWtvVmw4V2ErZG0K",
       "endpoints": [
         "https://github.com/Heiphaistos/PureRemove-AppWindows/releases/latest/download/latest.json"
       ],
