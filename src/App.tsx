@@ -5,6 +5,7 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 import { DropZone } from "@/components/DropZone";
 import { SplitPreview } from "@/components/SplitPreview";
 import { BatchList } from "@/components/BatchList";
+import { UpdateControls } from "@/components/UpdateControls";
 import { OutputOptions } from "@/components/OutputOptions";
 import { generateId } from "@/lib/utils";
 import { version } from "../package.json";
@@ -252,7 +253,10 @@ export default function App() {
           <span className="text-muted-foreground text-xs bg-secondary px-2 py-0.5 rounded-full">v{version}</span>
         </div>
 
-        <OutputOptions value={background} onChange={setBackground} disabled={single?.isProcessing} />
+        <div className="flex items-center gap-3">
+          <OutputOptions value={background} onChange={setBackground} disabled={single?.isProcessing} />
+          <UpdateControls />
+        </div>
       </header>
 
       {/* ── Bandeau modèle manquant ── */}
