@@ -5,6 +5,20 @@
 
 ---
 
+## v1.6.0 — 2026-10-15
+
+### Ajouté
+
+- Mise à jour automatique : vérification silencieuse au démarrage, bouton « Rechercher une mise à jour » (menu « Mises à jour »), dialogue avec version et notes, progression, installation silencieuse puis redémarrage.
+- Réglage « Vérifier les mises à jour automatiquement » (actif par défaut) pour couper la vérification.
+- Intégrité : chaque mise à jour est vérifiée par signature minisign avant installation. Les mises à jour passent par l'installeur NSIS (installation par utilisateur, sans droits administrateur) ; le `.msi` machine ne se met pas à jour seul.
+
+### Corrigé
+
+- Badge de version du README (affichait 1.2.1).
+
+---
+
 ## v1.5.1 — 2026-10-02
 
 ### Corrigé

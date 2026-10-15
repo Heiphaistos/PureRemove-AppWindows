@@ -1,6 +1,6 @@
 # PureRemove — Suppression d'arrière-plan par IA
 
-![Version](https://img.shields.io/badge/version-1.2.1-blueviolet?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.6.0-blueviolet?style=flat-square)
 ![Plateforme](https://img.shields.io/badge/plateforme-Windows%2010%2F11-0078D4?style=flat-square&logo=windows)
 ![Stack](https://img.shields.io/badge/stack-Tauri%20v2%20·%20Rust%20·%20React%20·%20ONNX-orange?style=flat-square)
 ![Licence](https://img.shields.io/badge/licence-MIT-green?style=flat-square)
@@ -23,6 +23,7 @@
 - **Protection mémoire** — downscale automatique des images > 4096px avant inférence
 - **Interface sombre** — thème dark natif, damier de transparence intégré
 - **Préférences persistées** — le fond de sortie et la couleur custom sont mémorisés entre les sessions
+- **Mise à jour automatique** — vérification signée (minisign) au démarrage, bouton « Rechercher une mise à jour », désactivable dans le menu « Mises à jour »
 - **100% hors-ligne** — aucune connexion réseau requise après installation
 
 ---
