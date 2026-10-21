@@ -5,6 +5,19 @@
 
 ---
 
+## v1.7.0 — 2026-10-21
+
+### Sécurité
+
+- Vulnérabilité Dependabot modérée (GHSA-rj75-hqrm-r3gf, `postcss-selector-parser` < 7.1.6) corrigée via un `overrides` npm ciblé vers 7.1.6, sans monter `tailwindcss` en v4 (changement majeur non souhaité) ; `postcss-nested` suit automatiquement. CSS de sortie vérifié identique après la correction.
+- `package.json` (resté à 1.6.0) et le lockfile alignés sur 1.7.0, et `@tauri-apps/plugin-dialog` épinglé à 2.7.3 pour rester apparié au crate Rust `tauri-plugin-dialog` 2.7.2 (sinon le build Tauri 2.12 refuse de compiler, « version mismatched Tauri packages »).
+
+### Notes
+
+- Build NSIS signé manuellement (`tauri signer sign`) après que le CLI a refusé de signer automatiquement avec `TAURI_SIGNING_PRIVATE_KEY_PATH` lors du `build` complet ; signature vérifiée cryptographiquement (Ed25519/blake2b) contre la clé publique embarquée dans l'application avant publication.
+
+---
+
 ## v1.6.0 — 2026-10-15
 
 ### Ajouté
