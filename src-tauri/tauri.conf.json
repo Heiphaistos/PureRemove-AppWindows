@@ -1,6 +1,6 @@
 {
   "productName": "PureRemove",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "identifier": "com.pureremove.desktop",
   "build": {
     "frontendDist": "../dist",
