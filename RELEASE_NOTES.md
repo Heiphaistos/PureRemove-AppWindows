@@ -5,6 +5,14 @@
 
 ---
 
+## v1.8.0 — non publiée
+
+### Sécurité
+
+- `tauri-plugin-updater` 2.14.0 → 2.14.1 : retire `zip` 4.6.1 vulnérable (RUSTSEC-2026-0367/0368/0369/0429), remplacé par `zip` 9.3.0. Le paquet npm `@tauri-apps/plugin-updater` 2.14.0 reste apparié (même version mineure).
+
+---
+
 ## v1.7.0 — 2026-10-21
 
 ### Sécurité
